@@ -14,6 +14,16 @@ GRAD_ACCUM_STEPS = 2000 // BATCH_SIZE
 
 
 def get_dataloaders(tokenizer, path_tokenized_dataset):
+    """
+    Load loaders with data
+    Args:
+        tokenizer (transformers.AutoTokenizer): Data tokenizer
+        path_tokenized_dataset (str): Path to dict of datasets.arrow_dataset.Dataset dataset
+
+    Returns:
+          train (torch.utils.data.dataloader.DataLoader): Train dataloader
+          test (torch.utils.data.dataloader.DataLoader): Test dataloader
+    """
     tokenized_datasets = load_from_disk(path_tokenized_dataset)
     train_collator = DataCollatorForWholeWordMask(tokenizer=tokenizer, mlm_probability=0.15)
     test_collator = DataCollatorForWholeWordMask(tokenizer=tokenizer, mlm_probability=0.15)
@@ -26,6 +36,9 @@ def get_dataloaders(tokenizer, path_tokenized_dataset):
 
 
 def run():
+    """
+    Setup experiment with plain MLM training and train
+    """
     # init accelerator
     from accelerate import DeepSpeedPlugin
     # deepspeed_plugin = DeepSpeedPlugin(zero_stage=2, gradient_accumulation_steps=2)

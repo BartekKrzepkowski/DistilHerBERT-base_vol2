@@ -58,6 +58,8 @@ class DistilTrainer(object):
         Args:
             exp_name (str): Base name of experiment
             random_seed (int): seed generator
+        Returns:
+            save_path (str): Path to save the model
         """
         self.manual_seed(random_seed)
         print('is fp16?', self.accelerator.use_fp16)

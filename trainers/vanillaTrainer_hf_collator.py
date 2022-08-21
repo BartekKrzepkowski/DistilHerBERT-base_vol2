@@ -25,6 +25,17 @@ class VanillaTrainer(object):
         self.device = device
 
     def run_exp(self, epoch_start, epoch_end, exp_name, config_run_epoch, random_seed=42):
+        """
+        Main method of trainer.
+        Init df -> [Init Run -> [Run Epoch]_{IL} -> Update df]_{IL}]
+        {IL - In Loop}
+        Args:
+            epoch_start (int): A number representing the beginning of run
+            epoch_end (int): A number representing the end of run
+            exp_name (str): Base name of experiment
+            config_run_epoch (): ##
+            random_seed (int): Seed generator
+        """
         save_path = self.at_exp_start(exp_name, random_seed)
         for epoch in tqdm(range(epoch_start, epoch_end), desc='run_exp'):
             self.model.train()
@@ -35,6 +46,15 @@ class VanillaTrainer(object):
         wandb.finish()
 
     def at_exp_start(self, exp_name, random_seed):
+        """
+        Initialization of experiment.
+        Creates fullname, dirs and loggers.
+        Args:
+            exp_name (str): Base name of experiment
+            random_seed (int): seed generator
+        Returns:
+            save_path (str): Path to save the model
+        """
         self.manual_seed(random_seed)
         print('is fp16?', self.accelerator.use_fp16)
         date = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -49,6 +69,15 @@ class VanillaTrainer(object):
         return save_path
 
     def run_epoch(self, epoch, save_path, config_run_epoch, phase):
+        """
+        Init df -> [Init Run -> [Run Epoch]_{IL} -> Update df]_{IL}]
+        {IL - In Loop}
+        Args:
+            epoch (int): Current epoch
+            save_path (str): Path to save the model
+            config_run_epoch (): ##
+            phase (train|test): Phase of training
+        """
         running_loss = 0.0
         running_denom = 0.0
         global_step = 0
@@ -105,13 +134,23 @@ class VanillaTrainer(object):
                 running_denom = 0.0
 
                 if (i + 1) % config_run_epoch.save_interval == 0 or (i + 1) == loader_size:
-                    self.save_student(save_path)
+                    self.save_student(save_path, i)
 
-    def save_student(self, path):
-        # torch.save(self.student.state_dict(), f"{path}/student_{datetime.datetime.utcnow()}.pth")
-        self.model.save_pretrained(f"{path}/student_{datetime.datetime.utcnow()}.pth")
+    def save_student(self, path, step):
+        """
+        Save the model.
+        Args:
+            save_path (str): Path to save the model
+            step (int): Step of the run
+        """
+        self.student.save_pretrained(f"{path}/model_{datetime.datetime.utcnow()}_step_{step}.pth")
 
     def manual_seed(self, random_seed):
+        """
+        Set the environment for reproducibility purposes.
+        Args:
+            random_seed (int): seed generator
+        """
         if 'cuda' in self.device.type:
             torch.cuda.empty_cache()
             torch.backends.cudnn.deterministic = True
