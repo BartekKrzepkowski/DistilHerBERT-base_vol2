@@ -12,3 +12,7 @@ https://jarvislabs.ai/blogs/accelerate/?fbclid=IwAR2-Plufxv7UtjsFq-Yqb7TzEd4keaB
 You should also change the path to the tokenized dataset inside this script in the "run" method (sorry).
 
 I can share the tokenized CCsub (as long as I have it saved somewhere by then).
+
+
+You can also check the model at Huggingface hub
+https://huggingface.co/BartekK/distilHerBERT-base-cased
